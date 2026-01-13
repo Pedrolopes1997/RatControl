@@ -16,7 +16,7 @@ Diferente de sistemas complexos, ele foca na agilidade: um Timer global sempre a
 ### ✨ Funcionalidades Principais
 
 * **⏱️ Time Tracking Inteligente:** Cronômetro global (anti-drift) com suporte a pausas, retomadas e inserção manual.
-* **kanban 📋 Gestão de Projetos:** Quadro Kanban (To Do, Doing, Done) com checklists e arrastar-e-soltar.
+* **📋 Gestão de Projetos (Kanban):** Quadro visual (To Do, Doing, Done) com checklists e arrastar-e-soltar.
 * **💰 Financeiro & Relatórios:** Análise de lucro por projeto (Custo Hora vs. Valor Cobrado), despesas e receitas multi-moeda.
 * **📄 Propostas & Contratos:** Gerador de orçamentos em PDF com cálculo automático de horas/valor.
 * **🤝 Portal do Cliente:** Área externa segura (via Token) para o cliente aprovar tarefas, visualizar cronogramas e trocar mensagens/arquivos.
@@ -56,7 +56,7 @@ try {
 }
 ?>
 3. Instalação Automática (Migration)O sistema possui um script de auto-reparo e instalação. Basta acessar via navegador:http://localhost/ratcontrol/reparar_banco.php
-Isso criará todas as tabelas necessárias e um usuário administrador padrão:Login: admin@admin.comSenha: 123456Nota: Apague ou proteja o arquivo reparar_banco.php após a instalação em produção.🖼️ Screenshots(Você pode adicionar imagens aqui depois, basta tirar print das telas e colocar na pasta assets/prints)DashboardTimerKanbanPortal do Cliente🛠️ Estrutura de Pastasratcontrol/
+Isso criará todas as tabelas necessárias e um usuário administrador padrão:Login: admin@admin.comSenha: 123456Nota: Apague ou proteja o arquivo reparar_banco.php após a instalação em produção.🖼️ ScreenshotsDashboardTimerKanbanPortal do Cliente🛠️ Estrutura de Pastasratcontrol/
 ├── api.php              # Central de requisições AJAX (Timer, Kanban, Chat)
 ├── config/              # Conexão com banco de dados
 ├── includes/            # Header, Footer, Auth, Mailer
@@ -67,7 +67,3 @@ Isso criará todas as tabelas necessárias e um usuário administrador padrão:L
 ├── portal.php           # Área externa do cliente
 └── ...
 🤝 ContribuiçãoContribuições são bem-vindas! Se você tiver uma ideia de melhoria:Faça um Fork do projeto.Crie uma Branch para sua Feature (git checkout -b feature/IncrivelFeature).Faça o Commit (git commit -m 'Add some IncrivelFeature').Faça o Push (git push origin feature/IncrivelFeature).Abra um Pull Request.📄 LicençaEste projeto está sob a licença MIT. Veja o arquivo LICENSE para mais detalhes.Feito com 💙 por Pedro Lopes
-### Dicas Finais para o GitHub:
-
-1.  **Screenshots:** Assim que subir o projeto, tire uns *prints* bonitos da tela do Kanban, do Timer rodando e do Relatório Financeiro. Substitua os links `https://placehold.co...` pelos caminhos das suas imagens. Isso aumenta muito o interesse de quem visita o repositório.
-2.  **Ignorar Arquivos Sensíveis:** Certifique-se de que o arquivo `.gitignore` que criamos antes esteja presente para não subir senhas do banco de dados.
