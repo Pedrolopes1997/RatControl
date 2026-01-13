@@ -8,7 +8,7 @@ $id_editar = '';
 $nome_editar = '';
 $cor_editar = '#0d6efd'; // Azul padrão
 
-// 1. PROCESSAR FORMULÁRIO (CRIAR / EDITAR / EXCLUIR)
+// 1. PROCESSAR FORMULÁRIO
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $tipo = $_POST['acao'];
     
@@ -17,25 +17,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
         if ($id) {
             $pdo->prepare("DELETE FROM tags WHERE id = :id AND usuario_id = :uid")->execute([':id' => $id, ':uid' => $usuario_id]);
-            $_SESSION['toast_msg'] = ['tipo' => 'success', 'texto' => 'Tag removida.'];
+            $_SESSION['toast_msg'] = ['tipo' => 'success', 'texto' => 'Tag removida com sucesso.'];
         }
     }
     
-    // SALVAR (CRIAR OU EDITAR)
+    // SALVAR
     elseif (isset($_POST['nome'])) {
         $nome = filter_input(INPUT_POST, 'nome', FILTER_SANITIZE_SPECIAL_CHARS);
+        // Validação básica de cor hex
         $cor = $_POST['cor'] ?? '#6c757d';
+        if (!preg_match('/^#[a-f0-9]{6}$/i', $cor)) $cor = '#6c757d'; 
+
         $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
 
         if ($nome) {
             if ($tipo === 'editar' && $id) {
-                // UPDATE
                 $sql = "UPDATE tags SET nome = :nome, cor = :cor WHERE id = :id AND usuario_id = :uid";
                 $stmt = $pdo->prepare($sql);
                 $stmt->execute([':nome' => $nome, ':cor' => $cor, ':id' => $id, ':uid' => $usuario_id]);
                 $msg_texto = 'Tag atualizada!';
             } else {
-                // INSERT
                 $sql = "INSERT INTO tags (usuario_id, nome, cor) VALUES (:uid, :nome, :cor)";
                 $stmt = $pdo->prepare($sql);
                 $stmt->execute([':uid' => $usuario_id, ':nome' => $nome, ':cor' => $cor]);
@@ -47,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// 2. MODO EDIÇÃO (Se clicou no lápis)
+// 2. MODO EDIÇÃO
 if (isset($_GET['editar'])) {
     $id_editar = filter_input(INPUT_GET, 'editar', FILTER_VALIDATE_INT);
     $stmt = $pdo->prepare("SELECT * FROM tags WHERE id = :id AND usuario_id = :uid");
@@ -61,7 +62,7 @@ if (isset($_GET['editar'])) {
     }
 }
 
-// 3. LISTAR TAGS
+// 3. LISTAR
 $stmt = $pdo->prepare("SELECT * FROM tags WHERE usuario_id = :uid ORDER BY nome ASC");
 $stmt->execute([':uid' => $usuario_id]);
 $tags = $stmt->fetchAll();
@@ -109,10 +110,10 @@ require 'includes/header.php';
                         </div>
                     </div>
 
-                    <div class="mb-4 text-center p-3 bg-light rounded border border-dashed">
-                        <small class="d-block text-muted mb-2">Pré-visualização:</small>
+                    <div class="mb-4 text-center p-4 bg-light rounded border border-dashed">
+                        <small class="d-block text-muted mb-2 text-uppercase fw-bold" style="font-size: 0.7rem;">Pré-visualização</small>
                         <span id="badge-preview" class="badge rounded-pill px-3 py-2 fs-6 shadow-sm" 
-                              style="background-color: <?php echo $cor_editar; ?>;">
+                              style="background-color: <?php echo $cor_editar; ?>; transition: all 0.3s;">
                             <?php echo $nome_editar ?: 'Nome da Tag'; ?>
                         </span>
                     </div>
@@ -136,7 +137,7 @@ require 'includes/header.php';
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
-                        <thead class="bg-light">
+                        <thead class="bg-light small text-uppercase text-muted">
                             <tr>
                                 <th class="ps-4">Visualização</th>
                                 <th>Nome da Tag</th>
@@ -146,7 +147,7 @@ require 'includes/header.php';
                         <tbody>
                             <?php foreach($tags as $t): ?>
                             <tr>
-                                <td class="ps-4" style="width: 150px;">
+                                <td class="ps-4" style="width: 180px;">
                                     <span class="badge rounded-pill px-3 py-2 shadow-sm" 
                                           style="background-color: <?php echo $t['cor']; ?>; font-weight: 500;">
                                         <?php echo $t['nome']; ?>
@@ -188,15 +189,28 @@ require 'includes/header.php';
 </div>
 
 <script>
-// Atualiza o Badge de Preview em tempo real enquanto digita
+// Função para calcular contraste (Texto preto ou branco)
+function getContrastYIQ(hexcolor){
+    hexcolor = hexcolor.replace("#", "");
+    var r = parseInt(hexcolor.substr(0,2),16);
+    var g = parseInt(hexcolor.substr(2,2),16);
+    var b = parseInt(hexcolor.substr(4,2),16);
+    var yiq = ((r*299)+(g*587)+(b*114))/1000;
+    return (yiq >= 128) ? 'black' : 'white';
+}
+
 function atualizarPreview() {
     const nome = document.getElementById('input-nome').value;
     const cor = document.getElementById('input-cor').value;
     const badge = document.getElementById('badge-preview');
     
     badge.style.backgroundColor = cor;
+    badge.style.color = getContrastYIQ(cor); // Ajusta cor do texto automaticamente
     badge.innerText = nome ? nome : 'Nome da Tag';
 }
+
+// Roda uma vez ao carregar para ajustar contraste inicial
+document.addEventListener('DOMContentLoaded', atualizarPreview);
 </script>
 
 <?php require 'includes/footer.php'; ?>
